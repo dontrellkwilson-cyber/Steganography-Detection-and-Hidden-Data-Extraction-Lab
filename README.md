@@ -74,9 +74,9 @@ Using Paraben’s E3 and several specialized steganography tools, I searched the
 
 ---
 
-# Section 1: Hands-On Investigation
+## Section 1: Hands-On Investigation
 
-## Part 1: Detect Steganography Software on the Drive Image
+### Part 1: Detect Steganography Software on the Drive Image
 
 I opened the existing E3 case:
 
@@ -98,11 +98,11 @@ The search returned:
 temp17.exe.exe
 ```
 
-Although the file had been renamed, its MD5 hash matched the **OpenPuff steganography tool**. This demonstrated why hash-based detection is more reliable than filename analysis alone.
+Although the file had been renamed, its MD5 hash matched the known OpenPuff entry in the attached hash database. This demonstrated that exact known-file hash matching can identify a renamed executable when its contents remain unchanged.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/891bc44a-bf51-49f5-b232-93b5288f0238"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Paraben E3 identifying the renamed OpenPuff executable through an MD5 hash match"
        width="800">
 </p>
 
@@ -112,7 +112,7 @@ Although the file had been renamed, its MD5 hash matched the **OpenPuff steganog
 
 ---
 
-## Part 2: Detect Hidden Data in Image Files
+### Part 2: Detect Hidden Data in Image Files
 
 I navigated to:
 
@@ -137,7 +137,7 @@ I scanned the folder with StegExpose:
 java -jar "C:\Program Files (x86)\StegExpose-master\StegExpose.jar" "C:\Users\Administrator\Documents\E3 Cases\Beverly Gates evidence\Received"
 ```
 
-StegExpose identified:
+StegExpose flagged the following file as a suspected hidden-data carrier:
 
 ```text
 Lakeview.bmp
@@ -145,23 +145,23 @@ Lakeview.bmp
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5d2afd9d-dbb6-414b-963b-1d7d3dfa087d"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="StegExpose command-line results flagging Lakeview BMP as a suspected carrier"
        width="800">
 </p>
 
 <p align="center">
-  <em>Figure 2: StegExpose identified `Lakeview.bmp` as a suspected hidden-data carrier.</em>
+  <em>Figure 2: StegExpose flagging `Lakeview.bmp` as a suspected hidden-data carrier.</em>
 </p>
 
 ---
 
-## Visual Inspection of the Carrier Image
+#### Visual Inspection of the Carrier Image
 
-I opened `Lakeview.bmp` in Microsoft Paint. The image appeared normal during visual inspection, demonstrating that hidden data can be embedded without an obvious visible change.
+I opened `Lakeview.bmp` in Microsoft Paint. The image appeared normal during visual inspection. This showed that visual review alone was not enough to determine whether the file contained concealed data.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/04bb999b-7018-4a75-ab31-98f154e522f1"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Microsoft Paint displaying the visually normal Lakeview BMP carrier image"
        width="800">
 </p>
 
@@ -171,7 +171,7 @@ I opened `Lakeview.bmp` in Microsoft Paint. The image appeared normal during vis
 
 ---
 
-## Part 3: Extract Hidden Data with OpenPuff
+### Part 3: Extract Hidden Data with OpenPuff
 
 I opened the `ReadMe` file in the exported `Received` folder and recorded the passphrase:
 
@@ -192,13 +192,13 @@ I launched OpenPuff and selected **Unhide Data**. I entered the recovered passph
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5ff34376-f03e-45d8-9075-6123863578b9"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="OpenPuff configuration used to extract hidden data from Lakeview BMP"
        width="32%">
   <img src="https://github.com/user-attachments/assets/0b48a828-8a36-4e14-832a-7410b70f265e"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="OpenPuff successfully extracting locations txt from the Lakeview carrier"
        width="32%">
   <img src="https://github.com/user-attachments/assets/2d2e7012-d5a0-4d28-bb87-fd6adb40b7c0"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Extracted locations txt file displaying Chicago-area coordinates"
        width="32%">
 </p>
 
@@ -206,19 +206,17 @@ I launched OpenPuff and selected **Unhide Data**. I entered the recovered passph
   <em>Figure 4: The contents of the hidden file extracted from `Lakeview.bmp` using OpenPuff.</em>
 </p>
 
-### Investigative Significance
+#### Investigative Significance
 
-```text
-The extracted locations.txt file contained latitude and longitude coordinates linked to Chicago-area streets, businesses, landmarks, and intersections. The fact that this information was hidden inside Lakeview.bmp showed that geographic data was intentionally concealed rather than stored as a normal text file.
+The extracted `locations.txt` file contained latitude and longitude coordinates linked to Chicago-area streets, businesses, landmarks, and intersections. Its recovery from `Lakeview.bmp` confirmed that the carrier contained concealed geographic data.
 
-Investigators could compare these locations with known vehicle-theft sites, recovered vehicles, surveillance records, and other evidence from the case. The coordinates alone did not prove criminal activity, but the list of concealed locations could help identify places associated with the suspect’s movements or planned activity.
-```
+Investigators could compare the locations with known vehicle-theft sites, recovered vehicles, surveillance records, and other case evidence. The coordinates alone did not prove criminal activity, but they provided geographic leads for further investigation.
 
 ---
 
-# Section 2: Applied Learning
+## Section 2: Applied Learning
 
-## Part 1: Detect Additional Steganography Software
+### Part 1: Detect Additional Steganography Software
 
 I reopened the Beverly Gates E3 case and attached:
 
@@ -230,22 +228,23 @@ I ran another Sorted Files Search. The query returned three results, including t
 
 | Search Result | Description | Hash Relationship |
 |---|---|---|
-| `f_0002ef` | Open **Show Links** to identify the tool description | Same MD5 and file size as `123rt.exe.exe`; the files are identical copies with different names |
-| `123rt.exe.exe` | Same description as `f_0002ef` because the MD5 hashes match | Same MD5 and file size as `f_0002ef`; duplicate file |
+| `f_0002ef` | Open **Show Links** to identify the tool description | Same MD5 and file size as `123rt.exe.exe`; strongly indicates the same file content under a different name |
+| `123rt.exe.exe` | Same description as `f_0002ef` because the MD5 hashes match | Same MD5 and file size as `f_0002ef`; strongly indicates duplicate content |
 | `funnycat.exe.exe` | Open **Show Links** to identify the separate tool description | Different MD5 and file size; separate file or steganography tool |
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/8985a75b-d1a0-4fb2-8089-b83396aa86b3"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Paraben E3 displaying additional known-file hash matches from Hash Database 2"
        width="800">
 </p>
 
-  <em>Figure 5: The second E3 hash search and the description of the identified steganography software.</em>
+<p align="center">
+  <em>Figure 5: The second E3 hash search and the descriptions associated with the identified files.</em>
 </p>
 
 ---
 
-## Part 2: Detect Hidden Data in Image and Audio Files
+### Part 2: Detect Hidden Data in Image and Audio Files
 
 I navigated to:
 
@@ -262,9 +261,9 @@ Beverly Gates evidence
                                 └── Sent
 ```
 
-The folder contained five GIF images, two WAV files, and supporting system artifacts. I exported the folder and scanned it with StegExpose.
+The folder contained five GIF images, two WAV files, and supporting system artifacts. I exported the folder and scanned the image files with StegExpose.
 
-### Suspicious Image Finding
+#### Suspicious Image Finding
 
 ```text
 dB9olster.gif
@@ -272,7 +271,7 @@ dB9olster.gif
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/60275f79-d489-4521-9d8a-36b3f17749d6"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="StegExpose results flagging dB9olster GIF as a suspected carrier"
        width="800">
 </p>
 
@@ -282,18 +281,18 @@ dB9olster.gif
 
 ---
 
-## WAV File Comparison
+#### WAV File Comparison
 
-I listened to both WAV files in Windows Media Player. They sounded the same, but E3 showed different file sizes and MD5 hashes. The larger WAV file was considered the stronger hidden-data candidate.
+I listened to both WAV files in Windows Media Player. They sounded the same, but E3 showed different file sizes and MD5 hashes. The differences proved that the files were not identical. Because `laugh_x1.wav` was slightly larger, I selected it as the first candidate for extraction testing.
 
 | WAV File | Size | MD5 | Assessment |
 |---|---:|---|---|
 | `laugh_x.wav` | `14,204 bytes` | `35D2A83D90A91FBBF70B256B78B39D90` | Baseline or smaller audio file |
-| `laugh_x1.wav` | `14,205 bytes` | `5D5286FEA9F45946A15F986FDE0A5E0C` | Suspected carrier file because it is slightly larger and has a different MD5 hash |
+| `laugh_x1.wav` | `14,205 bytes` | `5D5286FEA9F45946A15F986FDE0A5E0C` | Selected for extraction testing because it differed in size and hash |
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ba5b2b1d-5b15-4516-a190-a10ed4a4d500"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Paraben E3 comparing the sizes and MD5 hashes of two WAV files"
        width="800">
 </p>
 
@@ -303,7 +302,7 @@ I listened to both WAV files in Windows Media Player. They sounded the same, but
 
 ---
 
-## Part 3: Extract Hidden Data with S-Tools
+### Part 3: Extract Hidden Data with S-Tools
 
 I opened `key.txt` from the Sent folder. The file contained passphrases and references to algorithms, including Triple DES and RC2.
 
@@ -311,7 +310,7 @@ I loaded the suspicious image into S-Tools, selected **Reveal**, entered the mat
 
 | Field | Finding |
 |---|---|
-| Carrier Image | `dB9olser.gif` |
+| Carrier Image | `dB9olster.gif` |
 | Extraction Tool | S-Tools |
 | Passphrase | `besttool` |
 | Algorithm | `Triple DES` |
@@ -320,16 +319,16 @@ I loaded the suspicious image into S-Tools, selected **Reveal**, entered the mat
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/51bf97e1-b1f1-44fc-9841-916319de57a9"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="S-Tools displaying the suspected GIF carrier"
        width="24%">
   <img src="https://github.com/user-attachments/assets/e8403332-eced-4f5c-bf05-09cca0254678"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="S-Tools Reveal dialog configured with the recovered passphrase and Triple DES"
        width="24%">
   <img src="https://github.com/user-attachments/assets/9bac79a2-ea94-4697-be4a-f0f3ee079b03"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="S-Tools extracting the hidden What is tor document from the GIF carrier"
        width="24%">
   <img src="https://github.com/user-attachments/assets/81323ccf-983c-4087-ae9c-1fa9d44435a3"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Extracted document discussing Tor and anonymous communication"
        width="24%">
 </p>
 
@@ -339,7 +338,7 @@ I loaded the suspicious image into S-Tools, selected **Reveal**, entered the mat
 
 ---
 
-## Extract Hidden Data with Xiao
+### Extract Hidden Data with Xiao
 
 I opened Xiao, selected **Extract Files**, loaded the suspected WAV carrier, entered the correct password, and saved the output as:
 
@@ -357,28 +356,25 @@ WAV_extract
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d95484cc-1292-4ce9-96bc-e7e1942fb11f"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="Xiao successfully extracting WAV_extract from laugh_x1 WAV"
        width="800">
 </p>
 
 <p align="center">
-  <em>Figure 9: The contents of the hidden file extracted from the WAV carrier using Xiao.</em>
+  <em>Figure 9: Xiao successfully extracting the hidden file `WAV_extract` from the WAV carrier.</em>
 </p>
 
-### Investigative Significance
+#### Investigative Significance
 
-```text
-The file extracted from dB9olser.gif was a document explaining Tor, anonymous communication, IP-address concealment, VPN use, and access to the dark web. Its presence inside a hidden image could indicate an interest in concealing online activity or communicating anonymously.
+The file extracted from `dB9olster.gif` was a document discussing Tor, anonymous communication, IP-address concealment, VPN use, and access to the dark web. Its forensic relevance came from being concealed inside the GIF and from its relationship to the surrounding case evidence. The presence of information about Tor or VPNs alone would not establish unauthorized or criminal activity.
 
-The second hidden file was extracted from laugh_x1.wav using Xiao and the password partners. Although the exact text still needs to be confirmed by opening WAV_extract, the recovery of a concealed text file from an audio carrier showed that multiple file types were being used to hide information. Together, these findings demonstrated deliberate use of steganography and supported further examination of the recovered files and the suspect’s online activity.
-
-```
+The second hidden file was extracted from `laugh_x1.wav` using Xiao and the password `partners`. Although the exact text still needed to be confirmed by opening `WAV_extract`, the successful recovery established that the WAV file functioned as a carrier. Together, the findings showed that multiple carrier types were used to conceal data and supported further examination of the recovered files.
 
 ---
 
-# Section 3: Challenge and Analysis
+## Section 3: Challenge and Analysis
 
-## Part 1: Detect More Hidden Data
+### Part 1: Detect More Hidden Data
 
 I independently analyzed:
 
@@ -395,17 +391,17 @@ I ran StegExpose and identified two files suspected of containing concealed data
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/62c3349a-8384-4526-a196-1b02a8ed3ea7"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="StegExpose results flagging chicago BMP and chicago1 BMP during the challenge"
        width="800">
 </p>
 
 ---
 
-## Part 2: Extract More Hidden Data with OpenStego
+### Part 2: Extract More Hidden Data with OpenStego
 
 I used the cipher keys stored in the Section 3 folder to extract the hidden content from both carrier images using OpenStego.
 
-### First Extracted File
+#### First Extracted File
 
 | Field | Finding |
 |---|---|
@@ -416,7 +412,7 @@ I used the cipher keys stored in the Section 3 folder to extract the hidden cont
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/131622ad-0ad3-4417-9a09-e3db1a9cb17a"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="OpenStego extracted map image marking the Garfield Park Conservatory area"
        width="800">
 </p>
 
@@ -424,7 +420,7 @@ I used the cipher keys stored in the Section 3 folder to extract the hidden cont
   <em>Figure 10: The first hidden file extracted from the Section 3 evidence using OpenStego.</em>
 </p>
 
-### Second Extracted File
+#### Second Extracted File
 
 | Field | Finding |
 |---|---|
@@ -435,7 +431,7 @@ I used the cipher keys stored in the Section 3 folder to extract the hidden cont
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/89a8e97e-06b5-4223-a411-f9c2ccc9d0fe"
-       alt="iPhone mobile forensic investigation evidence"
+       alt="OpenStego extracted map image marking the Jackson Park Football Fields area"
        width="800">
 </p>
 
@@ -445,39 +441,39 @@ I used the cipher keys stored in the Section 3 folder to extract the hidden cont
 
 ---
 
-# Evidence Summary
+## Evidence Summary
 
 | Evidence | Tool | Result | Significance |
 |---|---|---|---|
-| `temp17.exe.exe` | E3 and Hash Database 1 | Identified as OpenPuff | Shows steganography software was present despite renaming |
-| `Lakeview.bmp` | StegExpose | Suspected hidden-data carrier | Required extraction with OpenPuff |
-| OpenPuff output | OpenPuff | Hidden file recovered | Contents may support the investigation |
-| Additional software files | E3 and Hash Database 2 | Three hash matches | Shows additional steganography-tool activity |
-| Suspicious GIF | StegExpose and S-Tools | Hidden file recovered | Demonstrates image-based concealment |
-| Suspicious WAV | E3 and Xiao | Hidden file recovered | Demonstrates audio-based concealment |
-| Section 3 carrier 1 | StegExpose and OpenStego | Hidden file recovered | Independent challenge result |
-| Section 3 carrier 2 | StegExpose and OpenStego | Hidden file recovered | Independent challenge result |
+| `temp17.exe.exe` | E3 and Hash Database 1 | Exact MD5 match to the known OpenPuff entry | Identified renamed steganography software when the file contents remained unchanged |
+| `Lakeview.bmp` | StegExpose and OpenPuff | Flagged for review and confirmed as a carrier through extraction | Contained concealed geographic data |
+| `locations.txt` | OpenPuff | Coordinate list recovered from `Lakeview.bmp` | Provides geographic leads for comparison with other case evidence |
+| `f_0002ef`, `123rt.exe.exe`, and `funnycat.exe.exe` | E3 and Hash Database 2 | Three known-file hash matches | Identified additional files associated with steganography tools |
+| `dB9olster.gif` | StegExpose and S-Tools | `What is tor.docx` recovered | Demonstrates password-protected image-based concealment |
+| `laugh_x1.wav` | E3 and Xiao | `WAV_extract` recovered | Confirms audio-based concealment; exact text still requires review |
+| `chicago.bmp` | StegExpose and OpenStego | `location_florida_snow.png` recovered | Independent challenge extraction containing a mapped location |
+| `chicago1.bmp` | StegExpose and OpenStego | `location_fenty.png` recovered | Independent challenge extraction containing a second mapped location |
 
 ---
 
-# Key Findings
+## Key Findings
 
-## Renaming Did Not Defeat Hash Detection
+### Renaming Did Not Defeat Hash Detection
 
 The file `temp17.exe.exe` did not reveal its actual purpose through its filename. The MD5 hash database identified it as OpenPuff.
 
-## Normal-Looking Files Can Carry Hidden Data
+### Normal-Looking Files Can Carry Hidden Data
 
-`Lakeview.bmp` appeared to be an ordinary image in Microsoft Paint. StegExpose and OpenPuff showed that it could still contain concealed data.
+`Lakeview.bmp` appeared to be an ordinary image in Microsoft Paint. StegExpose flagged it for review, and the successful OpenPuff extraction confirmed that it contained concealed data.
 
-## Audio Files Require Metadata Comparison
+### Audio Files Require Metadata Comparison
 
-The WAV files sounded the same, but their sizes and MD5 hashes were different. This showed the importance of metadata and hash comparison instead of relying only on playback.
+The WAV files sounded the same, but their sizes and MD5 hashes were different. This showed that playback alone was insufficient and that metadata comparison could help identify files requiring additional extraction testing.
 
-## Multiple Tools Were Required
+### Multiple Tools Were Required
 
 The investigation required E3, StegExpose, OpenPuff, S-Tools, Xiao, and OpenStego because no single tool covered every carrier type and extraction method.
 
 ---
 
-> **Ethical Use Notice:** This repository documents an authorized educational forensic investigation. Steganography tools and evidence-extraction techniques should only be used on systems and data for which proper authorization has been granted.+
+> **Ethical Use Notice:** This repository documents an authorized educational forensic investigation. Steganography tools and evidence-extraction techniques should only be used on systems and data for which proper authorization has been granted.
